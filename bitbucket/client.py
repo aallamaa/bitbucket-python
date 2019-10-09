@@ -25,7 +25,11 @@ class Client(object):
         if owner is None :
             owner = user_data.get('username')
         self.username = owner
+        self.urlusername = self.username
 
+    def change_username(self, username):
+        self.username = username
+        
     def get_user(self, params=None):
         """Returns the currently logged in user.
 
@@ -289,6 +293,20 @@ class Client(object):
         """
         return self._delete('2.0/repositories/{}/{}/hooks/{}'.format(self.username, repository_slug, webhook_uid),
                             params=params)
+
+    def get_deploy_keys(self, repository_slug, params=None):
+        """
+        Returns all deploy-keys belonging to a repository.
+        """
+        return self._get('2.0/repositories/{}/{}/deploy-keys'.format(self.username, repository_slug), params=params)
+
+    def create_deploy_keys(self, repository_slug, label, key, params=None):
+        """
+        Create a new deploy key in a repository.
+        """
+        return self._post('2.0/repositories/{}/{}/deploy-keys'.format(self.username, repository_slug),
+                          data=dict(label=label, key=key),
+                          params=params)
 
     def _get(self, endpoint, params=None):
         response = requests.get(self.BASE_URL + endpoint, params=params, auth=(self.user, self.password))
